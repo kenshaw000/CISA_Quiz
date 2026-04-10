@@ -617,51 +617,39 @@
     <script>
         const PASSING_SCORE = 56; // 56% = 450/800 on CISA exam
 
-        // Shuffle array using Fisher-Yates
-        function shuffleArray(array) {
-            const arr = [...array];
-            for (let i = arr.length - 1; i > 0; i--) {
-                const j = Math.floor(Math.random() * (i + 1));
-                [arr[i], arr[j]] = [arr[j], arr[i]];
-            }
-            return arr;
-        }
-
-        // Smart randomization: avoid obvious patterns
+        // Smart randomization: shuffle options per question, avoid consecutive same-position answers
         function smartRandomizeAnswers(questions) {
             const randomized = [];
-            let lastCorrectIndex = -1;
+            let lastCorrectPos = -1;
 
             questions.forEach(q => {
-                const options = [...q.options];
-                const correctOption = options[q.correct];
-                let correctIndex;
+                // Build array of { text, isCorrect } for all 4 options
+                const labeled = q.options.map((text, i) => ({ text, isCorrect: i === q.correct }));
 
-                do {
-                    const availableIndices = [0, 1, 2, 3].filter(i => i !== lastCorrectIndex);
-                    correctIndex = availableIndices[Math.floor(Math.random() * availableIndices.length)];
-                } while (correctIndex === lastCorrectIndex);
-
-                options[correctIndex] = correctOption;
-                const indices = [0, 1, 2, 3];
-                const otherIndices = indices.filter(i => i !== correctIndex);
-                const correctOptionOriginalIndex = q.correct;
-
-                for (let i = 0; i < correctOptionOriginalIndex; i++) {
-                    if (i !== correctIndex) options[i] = q.options[otherIndices.shift()];
+                // Fisher-Yates shuffle
+                for (let i = labeled.length - 1; i > 0; i--) {
+                    const j = Math.floor(Math.random() * (i + 1));
+                    [labeled[i], labeled[j]] = [labeled[j], labeled[i]];
                 }
-                for (let i = correctOptionOriginalIndex + 1; i < 4; i++) {
-                    if (i !== correctIndex) options[i] = q.options[otherIndices.shift()];
+
+                // Find where the correct answer landed
+                let correctPos = labeled.findIndex(o => o.isCorrect);
+
+                // If it landed in the same position as the previous question, swap it elsewhere
+                if (correctPos === lastCorrectPos) {
+                    const swapCandidates = [0, 1, 2, 3].filter(i => i !== correctPos);
+                    const swapTo = swapCandidates[Math.floor(Math.random() * swapCandidates.length)];
+                    [labeled[correctPos], labeled[swapTo]] = [labeled[swapTo], labeled[correctPos]];
+                    correctPos = swapTo;
                 }
+
+                lastCorrectPos = correctPos;
 
                 randomized.push({
                     ...q,
-                    options,
-                    correct: correctIndex,
-                    originalCorrect: q.correct
+                    options: labeled.map(o => o.text),
+                    correct: correctPos
                 });
-
-                lastCorrectIndex = correctIndex;
             });
 
             return randomized;
