@@ -1,0 +1,1311 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+    <meta name="description" content="CISA Exam Study Guide - Interactive PWA with advanced progress tracking">
+    <meta name="theme-color" content="#667eea">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+    <meta name="apple-mobile-web-app-title" content="CISA Study">
+    <link rel="apple-touch-icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 180 180'><rect fill='%23667eea' width='180' height='180'/><text x='50%' y='50%' font-size='80' fill='white' text-anchor='middle' dominant-baseline='central' font-family='Arial'>🎓</text></svg>">
+    <link rel="manifest" href="data:application/manifest+json,{%22name%22:%22CISA%20Study%20Guide%22,%22short_name%22:%22CISA%20Study%22,%22description%22:%22Interactive%20CISA%20exam%20preparation%20with%20advanced%20progress%20tracking%22,%22start_url%22:%22%22,%22scope%22:%22%22,%22display%22:%22standalone%22,%22background_color%22:%22%23ffffff%22,%22theme_color%22:%22%23667eea%22,%22orientation%22:%22portrait-primary%22,%22icons%22:[{%22src%22:%22data:image/svg+xml,<svg%20xmlns='http://www.w3.org/2000/svg'%20viewBox='0%200%20192%20192'><rect%20fill='%23667eea'%20width='192'%20height='192'/><text%20x='50%25'%20y='50%25'%20font-size='100'%20fill='white'%20text-anchor='middle'%20dominant-baseline='central'%20font-family='Arial'>🎓</text></svg>%22,%22sizes%22:%22192x192%22,%22type%22:%22image/svg+xml%22,%22purpose%22:%22any%22},{%22src%22:%22data:image/svg+xml,<svg%20xmlns='http://www.w3.org/2000/svg'%20viewBox='0%200%20512%20512'><rect%20fill='%23667eea'%20width='512'%20height='512'/><text%20x='50%25'%20y='50%25'%20font-size='280'%20fill='white'%20text-anchor='middle'%20dominant-baseline='central'%20font-family='Arial'>🎓</text></svg>%22,%22sizes%22:%22512x512%22,%22type%22:%22image/svg+xml%22,%22purpose%22:%22any%22}]}">
+    <title>CISA Study Guide - PWA v4</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        html, body {
+            height: 100%;
+            width: 100%;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            padding: 20px;
+            padding-bottom: 80px;
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            background: white;
+            border-radius: 12px;
+            box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
+            overflow: hidden;
+        }
+
+        .header {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            padding: 30px 20px;
+            text-align: center;
+        }
+
+        .header h1 {
+            font-size: 2em;
+            margin-bottom: 5px;
+        }
+
+        .header p {
+            font-size: 0.95em;
+            opacity: 0.95;
+        }
+
+        .content {
+            padding: 25px;
+        }
+
+        .view {
+            display: none;
+        }
+
+        .view.active {
+            display: block;
+        }
+
+        .nav-tabs {
+            display: flex;
+            gap: 5px;
+            margin-bottom: 25px;
+            border-bottom: 2px solid #e0e0e0;
+            overflow-x: auto;
+        }
+
+        .nav-tab {
+            padding: 10px 15px;
+            background: none;
+            border: none;
+            cursor: pointer;
+            font-size: 0.9em;
+            font-weight: 600;
+            color: #666;
+            border-bottom: 3px solid transparent;
+            transition: all 0.3s ease;
+            white-space: nowrap;
+        }
+
+        .nav-tab:hover {
+            color: #667eea;
+        }
+
+        .nav-tab.active {
+            color: #667eea;
+            border-bottom-color: #667eea;
+        }
+
+        .dashboard-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 20px;
+            margin-bottom: 30px;
+        }
+
+        .stat-card {
+            background: linear-gradient(135deg, #f5f7fa 0%, #c3cfe2 100%);
+            padding: 20px;
+            border-radius: 8px;
+            border-left: 4px solid #667eea;
+        }
+
+        .stat-card h3 {
+            font-size: 0.9em;
+            color: #666;
+            margin-bottom: 10px;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+
+        .stat-card .value {
+            font-size: 2.2em;
+            font-weight: bold;
+            color: #667eea;
+            margin-bottom: 8px;
+        }
+
+        .stat-card .subtext {
+            font-size: 0.85em;
+            color: #888;
+        }
+
+        .stat-card .target-indicator {
+            font-size: 0.8em;
+            margin-top: 8px;
+            padding: 6px 8px;
+            background: white;
+            border-radius: 4px;
+            font-weight: 600;
+        }
+
+        .target-indicator.above {
+            color: #51cf66;
+        }
+
+        .target-indicator.below {
+            color: #ff6b6b;
+        }
+
+        .progress-bar {
+            width: 100%;
+            height: 8px;
+            background: #e0e0e0;
+            border-radius: 4px;
+            overflow: hidden;
+            margin-top: 8px;
+        }
+
+        .progress-fill {
+            height: 100%;
+            background: linear-gradient(90deg, #667eea 0%, #764ba2 100%);
+            transition: width 0.3s ease;
+        }
+
+        .target-line {
+            position: relative;
+            height: 12px;
+            background: #f0f0f0;
+            border-radius: 4px;
+            margin-top: 8px;
+            overflow: hidden;
+        }
+
+        .target-marker {
+            position: absolute;
+            height: 100%;
+            background: #ffd93d;
+            border: 2px solid #f0ad4e;
+            width: 3px;
+            left: 56%;
+            z-index: 2;
+        }
+
+        .domain-buttons {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(120px, 1fr));
+            gap: 10px;
+            margin-bottom: 20px;
+        }
+
+        .domain-btn {
+            padding: 12px;
+            background: #f5f5f5;
+            border: 2px solid #ddd;
+            border-radius: 8px;
+            cursor: pointer;
+            font-weight: 600;
+            transition: all 0.3s ease;
+            font-size: 0.85em;
+        }
+
+        .domain-btn:hover {
+            border-color: #667eea;
+            background: #f0f3ff;
+        }
+
+        .domain-btn.selected {
+            background: #667eea;
+            color: white;
+            border-color: #667eea;
+        }
+
+        .quiz-controls {
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+            margin-bottom: 20px;
+        }
+
+        .control-group {
+            background: #f9f9f9;
+            padding: 15px;
+            border-radius: 8px;
+            border: 1px solid #e0e0e0;
+        }
+
+        .control-group label {
+            display: block;
+            font-weight: 600;
+            margin-bottom: 10px;
+            color: #333;
+            font-size: 0.9em;
+        }
+
+        .checkbox-group {
+            display: flex;
+            flex-direction: column;
+            gap: 8px;
+        }
+
+        .checkbox-item {
+            display: flex;
+            align-items: center;
+        }
+
+        .checkbox-item input[type="checkbox"] {
+            margin-right: 8px;
+            cursor: pointer;
+            width: 18px;
+            height: 18px;
+        }
+
+        .checkbox-item label {
+            margin: 0;
+            cursor: pointer;
+            font-weight: normal;
+            font-size: 0.9em;
+        }
+
+        .button-group {
+            display: flex;
+            gap: 10px;
+            margin-top: 20px;
+            flex-wrap: wrap;
+        }
+
+        .btn {
+            padding: 10px 20px;
+            border: none;
+            border-radius: 8px;
+            cursor: pointer;
+            font-weight: 600;
+            transition: all 0.3s ease;
+            font-size: 0.9em;
+        }
+
+        .btn-primary {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+        }
+
+        .btn-primary:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(102, 126, 234, 0.4);
+        }
+
+        .btn-secondary {
+            background: #e0e0e0;
+            color: #333;
+        }
+
+        .btn-secondary:hover {
+            background: #d0d0d0;
+        }
+
+        .btn-danger {
+            background: #ff6b6b;
+            color: white;
+        }
+
+        .btn-danger:hover {
+            background: #ff5252;
+        }
+
+        .btn-success {
+            background: #51cf66;
+            color: white;
+        }
+
+        .btn-success:hover {
+            background: #40c057;
+        }
+
+        .question-card {
+            background: #f9f9f9;
+            border: 1px solid #e0e0e0;
+            border-radius: 8px;
+            padding: 20px;
+            margin-bottom: 20px;
+        }
+
+        .question-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: start;
+            margin-bottom: 15px;
+        }
+
+        .question-number {
+            background: #667eea;
+            color: white;
+            padding: 5px 10px;
+            border-radius: 6px;
+            font-size: 0.85em;
+            font-weight: bold;
+        }
+
+        .question-answered {
+            font-size: 0.85em;
+            font-weight: 600;
+        }
+
+        .question-answered.answered {
+            color: #51cf66;
+        }
+
+        .question-answered.unanswered {
+            color: #ffa94d;
+        }
+
+        .question-text {
+            font-size: 1em;
+            font-weight: 600;
+            color: #333;
+            margin-bottom: 15px;
+            line-height: 1.4;
+        }
+
+        .options {
+            display: flex;
+            flex-direction: column;
+            gap: 8px;
+            margin-bottom: 15px;
+        }
+
+        .option {
+            padding: 12px;
+            background: white;
+            border: 2px solid #ddd;
+            border-radius: 6px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            font-size: 0.9em;
+            text-align: left;
+        }
+
+        .option:hover {
+            border-color: #667eea;
+            background: #f0f3ff;
+        }
+
+        .option.selected {
+            background: #667eea;
+            color: white;
+            border-color: #667eea;
+        }
+
+        .option.correct {
+            background: #d3f9d8;
+            border-color: #51cf66;
+            color: #2f5233;
+        }
+
+        .option.incorrect {
+            background: #ffe0e0;
+            border-color: #ff6b6b;
+            color: #5c2e2e;
+        }
+
+        .explanation {
+            background: #e7f5ff;
+            border-left: 4px solid #339af0;
+            padding: 12px;
+            border-radius: 4px;
+            margin-top: 15px;
+            font-size: 0.9em;
+            color: #1971c2;
+            line-height: 1.5;
+        }
+
+        .quiz-progress {
+            background: #f5f5f5;
+            padding: 15px;
+            border-radius: 8px;
+            margin-bottom: 20px;
+            border: 1px solid #e0e0e0;
+        }
+
+        .progress-info {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 10px;
+            font-size: 0.9em;
+        }
+
+        .resume-options {
+            background: #f0f3ff;
+            border: 2px solid #667eea;
+            padding: 15px;
+            border-radius: 8px;
+            margin-bottom: 20px;
+        }
+
+        .resume-options h3 {
+            margin-bottom: 10px;
+            color: #667eea;
+            font-size: 1em;
+        }
+
+        .resume-options p {
+            font-size: 0.9em;
+            color: #555;
+            margin-bottom: 10px;
+        }
+
+        .missed-question {
+            background: #fff9e6;
+            border-left: 4px solid #ffa94d;
+            padding: 15px;
+            margin-bottom: 15px;
+            border-radius: 4px;
+        }
+
+        .missed-question h4 {
+            color: #994d00;
+            margin-bottom: 8px;
+            font-size: 0.95em;
+        }
+
+        .missed-filters {
+            display: flex;
+            gap: 10px;
+            margin-bottom: 15px;
+            flex-wrap: wrap;
+        }
+
+        .filter-tag {
+            padding: 6px 12px;
+            background: #f0f0f0;
+            border: 1px solid #ddd;
+            border-radius: 20px;
+            cursor: pointer;
+            font-size: 0.85em;
+            transition: all 0.3s ease;
+        }
+
+        .filter-tag.active {
+            background: #667eea;
+            color: white;
+            border-color: #667eea;
+        }
+
+        .install-prompt {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            padding: 20px;
+            border-radius: 8px;
+            margin-bottom: 20px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            gap: 15px;
+        }
+
+        .install-prompt button {
+            background: white;
+            color: #667eea;
+            border: none;
+            padding: 8px 15px;
+            border-radius: 6px;
+            cursor: pointer;
+            font-weight: 600;
+            transition: all 0.3s ease;
+        }
+
+        .install-prompt button:hover {
+            transform: scale(1.05);
+        }
+
+        .empty-state {
+            text-align: center;
+            padding: 40px 20px;
+            color: #999;
+        }
+
+        @media (max-width: 768px) {
+            .header h1 {
+                font-size: 1.5em;
+            }
+
+            .content {
+                padding: 15px;
+            }
+
+            .dashboard-grid {
+                grid-template-columns: 1fr;
+            }
+
+            .domain-buttons {
+                grid-template-columns: repeat(2, 1fr);
+            }
+
+            .install-prompt {
+                flex-direction: column;
+                text-align: center;
+            }
+
+            .button-group {
+                flex-direction: column;
+            }
+
+            .btn {
+                width: 100%;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>🎓 CISA Study Guide</h1>
+            <p>Interactive exam preparation with advanced progress tracking</p>
+        </div>
+
+        <div class="content">
+            <div class="nav-tabs">
+                <button class="nav-tab active" onclick="switchView('dashboard')">📊 Dashboard</button>
+                <button class="nav-tab" onclick="switchView('quiz')">📝 Quiz</button>
+                <button class="nav-tab" onclick="switchView('missed')">❌ Missed Questions</button>
+            </div>
+
+            <!-- DASHBOARD VIEW -->
+            <div id="dashboard" class="view active">
+                <div id="installPrompt"></div>
+
+                <div class="dashboard-grid">
+                    <div class="stat-card">
+                        <h3>Total Answered</h3>
+                        <div class="value" id="totalAnswered">0</div>
+                        <div class="subtext" id="totalAnsweredSub">0 of 120 questions</div>
+                        <div class="progress-bar">
+                            <div class="progress-fill" id="totalProgressBar" style="width: 0%"></div>
+                        </div>
+                    </div>
+                    <div class="stat-card">
+                        <h3>Overall Score (Latest)</h3>
+                        <div class="value" id="latestScore">—</div>
+                        <div class="subtext" id="latestScoreSub">Complete a quiz to see results</div>
+                        <div class="target-indicator" id="latestTargetInd"></div>
+                    </div>
+                    <div class="stat-card">
+                        <h3>Cumulative Score</h3>
+                        <div class="value" id="cumulativeScore">—</div>
+                        <div class="subtext" id="cumulativeScoreSub">Average across all attempts</div>
+                        <div class="target-indicator" id="cumulativeTargetInd"></div>
+                    </div>
+                </div>
+
+                <h3 style="margin: 20px 0 15px 0; color: #333; font-size: 1.1em;">Progress by Domain</h3>
+                <div class="dashboard-grid" id="domainStats"></div>
+
+                <h3 style="margin: 20px 0 15px 0; color: #333; font-size: 1.1em;">Quick Actions</h3>
+                <div class="button-group">
+                    <button class="btn btn-primary" onclick="quickStartDomain()">Start a Domain Quiz</button>
+                    <button class="btn btn-primary" onclick="quickStartAll()">Start All Domains</button>
+                    <button class="btn btn-secondary" onclick="clearAllData()">Clear All Data</button>
+                </div>
+            </div>
+
+            <!-- QUIZ VIEW -->
+            <div id="quiz" class="view">
+                <div id="quizSetup"></div>
+                <div id="quizContent" style="display: none;"></div>
+            </div>
+
+            <!-- MISSED QUESTIONS VIEW -->
+            <div id="missed" class="view">
+                <div id="missedContent"></div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        const PASSING_SCORE = 56; // 56% = 450/800 on CISA exam
+
+        // Shuffle array using Fisher-Yates
+        function shuffleArray(array) {
+            const arr = [...array];
+            for (let i = arr.length - 1; i > 0; i--) {
+                const j = Math.floor(Math.random() * (i + 1));
+                [arr[i], arr[j]] = [arr[j], arr[i]];
+            }
+            return arr;
+        }
+
+        // Smart randomization: avoid obvious patterns
+        function smartRandomizeAnswers(questions) {
+            const randomized = [];
+            let lastCorrectIndex = -1;
+
+            questions.forEach(q => {
+                const options = [...q.options];
+                const correctOption = options[q.correct];
+                let correctIndex;
+
+                do {
+                    const availableIndices = [0, 1, 2, 3].filter(i => i !== lastCorrectIndex);
+                    correctIndex = availableIndices[Math.floor(Math.random() * availableIndices.length)];
+                } while (correctIndex === lastCorrectIndex);
+
+                options[correctIndex] = correctOption;
+                const indices = [0, 1, 2, 3];
+                const otherIndices = indices.filter(i => i !== correctIndex);
+                const correctOptionOriginalIndex = q.correct;
+
+                for (let i = 0; i < correctOptionOriginalIndex; i++) {
+                    if (i !== correctIndex) options[i] = q.options[otherIndices.shift()];
+                }
+                for (let i = correctOptionOriginalIndex + 1; i < 4; i++) {
+                    if (i !== correctIndex) options[i] = q.options[otherIndices.shift()];
+                }
+
+                randomized.push({
+                    ...q,
+                    options,
+                    correct: correctIndex,
+                    originalCorrect: q.correct
+                });
+
+                lastCorrectIndex = correctIndex;
+            });
+
+            return randomized;
+        }
+
+        // ENHANCED QUIZ DATA with better answers
+        const baseQuizData = [
+            // GOVERNANCE (25%) - 30 questions
+            { id: 1, domain: 'Governance', text: 'Which of the following best describes the primary purpose of an IT governance framework?', options: ['To maximize IT spending and headcount', 'To align IT with business objectives and manage IT risk', 'To eliminate all IT risks entirely', 'To reduce the time required for IT approvals'], correct: 1, explanation: 'IT governance is specifically designed to align IT with business goals while managing risk. It does not seek to eliminate all risk or increase spending.' },
+            { id: 2, domain: 'Governance', text: 'What is the main focus of COBIT?', options: ['Establishing standard audit procedures for all organizations', 'IT governance and management framework for enterprise control', 'Setting international security standards for networks', 'Defining best practices for cloud migration projects'], correct: 1, explanation: 'COBIT (Control Objectives for Information and Related Technology) is a comprehensive governance and management framework for IT.' },
+            { id: 3, domain: 'Governance', text: 'Which role is responsible for ensuring IT governance is implemented across the organization?', options: ['Individual IT system administrators', 'Board of directors with management support', 'External consultants and auditors only', 'Business users through change requests'], correct: 1, explanation: 'The Board of Directors and management are ultimately responsible for governance implementation and oversight.' },
+            { id: 4, domain: 'Governance', text: 'What does ITIL primarily focus on?', options: ['Enterprise-wide governance frameworks and policy', 'IT service management best practices and lifecycle', 'Information security standards and compliance', 'Database architecture and management'], correct: 1, explanation: 'ITIL provides best practices for IT Service Management (ITSM), covering the entire IT service lifecycle.' },
+            { id: 5, domain: 'Governance', text: 'Which of the following is a key principle of effective IT governance?', options: ['Maximizing IT independence from business oversight', 'Transparency and accountability across all decisions', 'Avoiding documentation to increase agility', 'Decentralized decision-making without formal processes'], correct: 1, explanation: 'Transparency and accountability are fundamental principles of effective IT governance.' },
+            { id: 6, domain: 'Governance', text: 'What is the primary purpose of an IT steering committee?', options: ['To replace the Board and make all business decisions', 'To oversee IT strategy and make IT investment prioritization decisions', 'To execute all day-to-day IT operational tasks', 'To eliminate IT risk entirely from the organization'], correct: 1, explanation: 'An IT steering committee provides oversight of IT strategy, prioritization, and investment decisions to align with business goals.' },
+            { id: 7, domain: 'Governance', text: 'Which framework is most commonly used for comprehensive enterprise risk management?', options: ['ISO 9001 quality management standards', 'COSO Enterprise Risk Management framework', 'ISO 27001 information security only', 'ITIL v4 service management practices'], correct: 1, explanation: 'The COSO Enterprise Risk Management framework provides a comprehensive approach to enterprise risk management.' },
+            { id: 8, domain: 'Governance', text: 'What is the primary benefit of implementing a robust IT governance framework?', options: ['Increased IT department budgets and spending', 'Better alignment of IT investments with business objectives and risk management', 'Elimination of all business and technology risks', 'Faster software development without formal controls'], correct: 1, explanation: 'The primary benefit is achieving better alignment between IT investments and business objectives while managing risk appropriately.' },
+            { id: 9, domain: 'Governance', text: 'Which of the following is an example of an IT governance policy?', options: ['Installing the latest system security patches', 'An IT security policy establishing expectations for access control', 'Running a network cable through building infrastructure', 'Scheduling a routine software update for servers'], correct: 1, explanation: 'An IT security policy is a governance policy that sets expectations and controls for security practices.' },
+            { id: 10, domain: 'Governance', text: 'What does the balanced scorecard approach provide to governance?', options: ['Only quantitative financial and budget metrics', 'A balanced view of organizational performance across multiple perspectives', 'Exclusively IT performance measurements and goals', 'Elimination of the need for reporting and metrics'], correct: 1, explanation: 'Balanced scorecard provides multiple perspectives on performance: financial, customer, internal processes, and learning.' },
+            { id: 11, domain: 'Governance', text: 'Which element is most essential for effective IT governance?', options: ['Avoiding formal stakeholder involvement in decisions', 'Clear accountability and well-defined roles throughout IT', 'Minimal documentation and written policies', 'No performance metrics or measurement systems'], correct: 1, explanation: 'Clear accountability and well-defined roles are essential for effective governance and performance management.' },
+            { id: 12, domain: 'Governance', text: 'What is a key challenge organizations face when implementing IT governance?', options: ['Excessive availability of budget and resources', 'Resistance to change and organizational culture issues', 'Too many external regulatory requirements', 'Overwhelming amounts of existing documentation'], correct: 1, explanation: 'Cultural resistance and change management challenges are among the biggest obstacles to successful governance implementation.' },
+            { id: 13, domain: 'Governance', text: 'How should IT governance be aligned with overall business strategy?', options: ['IT should independently develop its own strategy without business input', 'Through continuous communication and integrated strategic planning', 'Only during annual budget planning meetings', 'Only through IT department decisions and technical committees'], correct: 1, explanation: 'Continuous communication and integrated planning ensure IT governance supports and aligns with business strategy.' },
+            { id: 14, domain: 'Governance', text: 'Which metrics are important to track IT governance effectiveness?', options: ['Only the speed of implementation and deployment', 'Cost, quality, risk management, and business alignment metrics', 'Security metrics only', 'Budget and financial metrics exclusively'], correct: 1, explanation: 'Effective governance requires balanced metrics covering cost, quality, risk management, and business alignment.' },
+            { id: 15, domain: 'Governance', text: 'What role does compliance and regulatory adherence play in IT governance?', options: ['No significant role in governance decisions', 'Ensures adherence to regulations and standards while supporting governance objectives', 'Only relevant for external auditors and regulators', 'Compliance requirements always reduce business flexibility'], correct: 1, explanation: 'Compliance ensures IT operations meet regulatory requirements and internal policies while supporting governance objectives.' },
+            { id: 16, domain: 'Governance', text: 'Which of the following best describes a governance control?', options: ['A technical software patch or update', 'A policy or procedure designed to ensure objectives are met and risk is managed', 'A backup system for disaster recovery purposes', 'A firewall rule for network traffic filtering'], correct: 1, explanation: 'Governance controls are policies, procedures, and practices that ensure objectives are achieved and risk is managed.' },
+            { id: 17, domain: 'Governance', text: 'What is the primary role of the CIO in organizational IT governance?', options: ['Technical implementation of systems only', 'Strategic leadership and accountability for IT delivery and governance', 'Help desk support for end-users', 'Cost reduction without considering business needs'], correct: 1, explanation: 'The CIO is responsible for strategic IT leadership, IT governance implementation, and accountability for IT performance.' },
+            { id: 18, domain: 'Governance', text: 'How frequently should IT governance frameworks be formally reviewed and updated?', options: ['Never, governance frameworks are permanent', 'Annually or when business strategy and environment changes', 'Only when crises or major incidents occur', 'Continuously and formally reviewed at least annually'], correct: 1, explanation: 'Governance frameworks should be periodically reviewed (annually) and adjusted when business strategy or environment changes.' },
+            { id: 19, domain: 'Governance', text: 'What is the primary purpose of establishing formal IT policies?', options: ['To add administrative work and complexity', 'To establish clear expectations and controls for achieving objectives', 'To slow down business processes', 'To increase costs without adding business value'], correct: 1, explanation: 'IT policies establish clear expectations for behavior and controls to ensure objectives are achieved and risk is managed.' },
+            { id: 20, domain: 'Governance', text: 'Which governance mechanism is most critical for IT investment decisions?', options: ['Random selection based on department preference', 'Portfolio management and governance processes', 'Individual department budgeting alone', 'User feature requests and individual approvals'], correct: 1, explanation: 'Portfolio management and governance provide a framework for evaluating, prioritizing, and overseeing IT investments.' },
+            { id: 21, domain: 'Governance', text: 'What is the fundamental relationship between IT governance and IT operations?', options: ['Governance controls and directs operations; operations execute within governance frameworks', 'Operations control and direct governance activities', 'They are completely unrelated and operate independently', 'Governance has no impact on how operations function'], correct: 0, explanation: 'Governance sets strategic direction and establishes control frameworks; operations execute within those frameworks.' },
+            { id: 22, domain: 'Governance', text: 'Which stakeholder groups must be engaged for successful IT governance?', options: ['Only IT department staff', 'Business leadership, IT leadership, and the Board', 'Only external auditors and consultants', 'Only end-users and business departments'], correct: 1, explanation: 'Business leadership, IT leadership, and the Board must all be engaged for effective governance.' },
+            { id: 23, domain: 'Governance', text: 'What should a formal IT governance charter include?', options: ['Only IT department responsibilities and budget', 'Purpose, scope, authority levels, and clearly defined responsibilities', 'Only financial spending limits', 'Only technical system requirements'], correct: 1, explanation: 'A governance charter clearly defines purpose, scope, authority levels, and responsibilities for decision-making.' },
+            { id: 24, domain: 'Governance', text: 'How does IT governance support organizational risk management?', options: ['It ignores risk and focuses only on performance', 'By establishing control frameworks and oversight for identified and emerging risks', 'Only by purchasing insurance coverage', 'By avoiding all management and decision-making activities'], correct: 1, explanation: 'IT governance establishes the framework and controls necessary to identify, assess, and manage IT-related risks.' },
+            { id: 25, domain: 'Governance', text: 'What are the consequences of poor IT governance?', options: ['None, governance does not impact business', 'Misaligned IT investments, uncontrolled risk, and compliance violations', 'Increased innovation and faster delivery', 'Faster time-to-market for all projects'], correct: 1, explanation: 'Poor governance leads to misaligned IT investments, inadequate risk management, and potential compliance violations.' },
+            { id: 26, domain: 'Governance', text: 'Which document typically outlines IT governance responsibilities and authority?', options: ['User manuals and technical documentation', 'IT governance policy or framework document', 'Hardware and software inventory lists', 'Incident logs and problem tickets'], correct: 1, explanation: 'An IT governance policy or framework document clearly outlines governance responsibilities and expectations.' },
+            { id: 27, domain: 'Governance', text: 'What is the purpose of IT governance metrics and reporting?', options: ['To complicate reporting and add unnecessary work', 'To provide transparency and accountability in governance effectiveness', 'To eliminate decision-making and management oversight', 'To reduce the need for governance oversight'], correct: 1, explanation: 'Metrics and reporting provide transparency, accountability, and insight into governance effectiveness and IT performance.' },
+            { id: 28, domain: 'Governance', text: 'How should IT governance adapt as the organization evolves?', options: ['Governance never needs to change after implementation', 'Through regular review and adjustment to remain aligned with business strategy', 'Only during organizational crises', 'Only in response to external regulatory mandates'], correct: 1, explanation: 'Governance should be regularly reviewed and adjusted to remain relevant as business strategy and environment change.' },
+            { id: 29, domain: 'Governance', text: 'What is a best practice approach for implementing IT governance?', options: ['Implement all governance controls simultaneously across the organization', 'Phased approach with stakeholder engagement and change management', 'No planning or change management is required', 'Consider only technical implementation factors'], correct: 1, explanation: 'A phased, planned approach with stakeholder engagement is the best practice for successful governance implementation.' },
+            { id: 30, domain: 'Governance', text: 'What role does documentation play in supporting IT governance?', options: ['No real role in governance activities', 'Essential for establishing expectations, accountability, and demonstrating compliance', 'Only needed during external audits', 'Documentation slows down governance processes'], correct: 1, explanation: 'Documentation is essential for establishing clear expectations, accountability, and demonstrating governance compliance.' },
+
+            // RISK MANAGEMENT (30%) - 36 questions
+            { id: 31, domain: 'Risk Management', text: 'What is the first and most critical step in any risk management process?', options: ['Immediately implementing risk mitigation controls', 'Systematic risk identification and analysis', 'Accepting all risks as inevitable', 'Avoiding risk discussion and planning'], correct: 1, explanation: 'Risk identification is the foundation of risk management; you cannot manage risks you have not identified.' },
+            { id: 32, domain: 'Risk Management', text: 'Which of the following best describes risk assessment in IT?', options: ['Attempting to eliminate all possible risks', 'Identifying and analyzing risks to determine likelihood and impact', 'Accepting all risks without analysis', 'Avoiding the analysis of potential threats'], correct: 1, explanation: 'Risk assessment involves identifying risks and analyzing their likelihood and impact to prioritize management efforts.' },
+            { id: 33, domain: 'Risk Management', text: 'What is risk tolerance in the context of IT risk management?', options: ['The amount of risk an organization is willing to accept in pursuit of objectives', 'The absolute elimination of all organizational risk', 'The ability to prevent any and all risk events', 'Complete avoidance of business opportunities'], correct: 0, explanation: 'Risk tolerance is the level of risk an organization is willing to accept while pursuing its objectives.' },
+            { id: 34, domain: 'Risk Management', text: 'Which risk response strategy is focused on reducing the likelihood or impact of a risk?', options: ['Completely avoiding the risky activity', 'Risk mitigation through controls and preventive measures', 'Accepting the risk without taking action', 'Transferring the risk to external parties'], correct: 1, explanation: 'Risk mitigation involves taking actions to reduce the probability or impact of a risk occurring.' },
+            { id: 35, domain: 'Risk Management', text: 'What is the primary purpose of maintaining a risk register?', options: ['To ignore identified risks', 'To document, track, and manage identified risks throughout their lifecycle', 'To create unnecessary administrative burden', 'To avoid making decisions about risk'], correct: 1, explanation: 'A risk register documents identified risks, their analysis, and management plans for tracking and oversight.' },
+            { id: 36, domain: 'Risk Management', text: 'Which of the following is the best example of risk transfer?', options: ['Accepting the risk and doing nothing', 'Purchasing insurance to transfer financial risk to another party', 'Completely eliminating the risky activity', 'Ignoring the risk until it materializes'], correct: 1, explanation: 'Risk transfer involves passing the risk to another party, such as through insurance or outsourcing.' },
+            { id: 37, domain: 'Risk Management', text: 'What does "risk appetite" mean in the context of an organization?', options: ['The hunger for profit at any cost', 'The level and type of risk an organization is willing to pursue to achieve objectives', 'Eliminating all organizational risk', 'Accepting all risks without consideration'], correct: 1, explanation: 'Risk appetite is the amount and type of risk an organization is willing to accept to achieve its objectives.' },
+            { id: 38, domain: 'Risk Management', text: 'How are identified risks typically prioritized for management?', options: ['Based on IT department preference and convenience', 'By analyzing impact and probability to focus on highest-risk items first', 'Randomly without any systematic approach', 'Based only on the cost of mitigation'], correct: 1, explanation: 'Risk prioritization uses impact and probability analysis to focus on the highest risks first.' },
+            { id: 39, domain: 'Risk Management', text: 'What is the ongoing role of risk monitoring?', options: ['To eliminate all identified risks immediately', 'To track risks and ensure that mitigation efforts are effective', 'To avoid taking action after initial assessment', 'To postpone management decisions indefinitely'], correct: 1, explanation: 'Risk monitoring provides ongoing tracking of risks and the effectiveness of controls and mitigation efforts.' },
+            { id: 40, domain: 'Risk Management', text: 'Which framework is commonly used as a standard for IT risk assessment?', options: ['ITIL exclusively for all risk management', 'NIST, ISO 27005, or enterprise risk management frameworks', 'Accounting standards and financial frameworks', 'Marketing and customer research methodologies'], correct: 1, explanation: 'NIST, ISO 27005, and enterprise risk management frameworks provide methodologies for IT risk assessment.' },
+            { id: 41, domain: 'Risk Management', text: 'What should a comprehensive risk assessment include?', options: ['Only financial impact analysis', 'Asset identification, threat analysis, vulnerability assessment, and impact analysis', 'Only technical risks to systems', 'Only compliance and regulatory risks'], correct: 1, explanation: 'Comprehensive risk assessment includes asset identification, threat analysis, vulnerability assessment, and impact analysis.' },
+            { id: 42, domain: 'Risk Management', text: 'How frequently should formal risk assessments be performed?', options: ['Never, one-time assessment is sufficient', 'Annually and when significant business or IT changes occur', 'Only during crisis situations', 'Only when required by external auditors'], correct: 1, explanation: 'Risk assessments should be performed annually and whenever significant business or IT changes occur.' },
+            { id: 43, domain: 'Risk Management', text: 'What is the primary focus of a security risk assessment?', options: ['Evaluating financial performance of IT investments', 'Identifying threats and vulnerabilities to information and systems', 'Compliance review and audit preparation only', 'Hardware and software inventory management'], correct: 1, explanation: 'A security risk assessment evaluates threats and vulnerabilities that could compromise information security.' },
+            { id: 44, domain: 'Risk Management', text: 'Which of the following is NOT considered a typical risk mitigation strategy?', options: ['Implementing controls to reduce risk', 'Monitoring and reassessing risks regularly', 'Completely ignoring identified risks', 'Developing contingency and recovery plans'], correct: 2, explanation: 'Ignoring identified risks is not a mitigation strategy; all risks must be addressed through acceptance, mitigation, transfer, or avoidance.' },
+            { id: 45, domain: 'Risk Management', text: 'What is residual risk?', options: ['The original risk before any mitigation attempts', 'Risk that remains after mitigation controls are applied and implemented', 'Risk that cannot be measured or quantified', 'The sum of all organizational risks'], correct: 1, explanation: 'Residual risk is the risk remaining after mitigation controls have been implemented and is the basis for acceptance decisions.' },
+            { id: 46, domain: 'Risk Management', text: 'How should business continuity planning relate to IT risk management?', options: ['No relationship exists between them', 'Business continuity plans must address IT risks and recovery strategies', 'Only IT risks are relevant to continuity', 'Business risks are irrelevant to IT planning'], correct: 1, explanation: 'Business continuity planning must address IT risks and incorporate IT recovery strategies.' },
+            { id: 47, domain: 'Risk Management', text: 'What is the purpose of effective risk communication?', options: ['To hide risks from stakeholders', 'To ensure all stakeholders understand risks and mitigation efforts', 'To avoid accountability for risk management', 'To delay or prevent decisions'], correct: 1, explanation: 'Effective risk communication ensures that all stakeholders understand identified risks and the organization\'s response.' },
+            { id: 48, domain: 'Risk Management', text: 'Who should be responsible for enterprise-level risk management oversight?', options: ['Only IT technical staff', 'Senior management and the Board with IT expertise', 'External parties and consultants exclusively', 'Business end-users without management involvement'], correct: 1, explanation: 'Senior management and the Board should oversee risk management to ensure appropriate governance and accountability.' },
+            { id: 49, domain: 'Risk Management', text: 'What is a vulnerability in the context of risk?', options: ['The same thing as a threat', 'A weakness in systems that can be exploited by threats', 'An impact or consequence of an event', 'A control or safeguard'], correct: 1, explanation: 'A vulnerability is a weakness in systems, processes, or controls that could be exploited by a threat.' },
+            { id: 50, domain: 'Risk Management', text: 'What is the relationship between threat and vulnerability in risk?', options: ['No relationship between them', 'A threat can exploit a vulnerability to cause harm or loss', 'They are essentially the same concept', 'Threats prevent vulnerabilities from occurring'], correct: 1, explanation: 'Risk occurs when a threat is capable of exploiting a vulnerability to cause harm or loss.' },
+            { id: 51, domain: 'Risk Management', text: 'How should organizations manage emerging and evolving risks?', options: ['Ignore them until they become critical issues', 'Monitor the environment and adjust risk strategies as new risks emerge', 'Wait for crises to occur before responding', 'Only address risks that were previously identified'], correct: 1, explanation: 'Organizations should monitor the environment and adjust strategies to address emerging risks before they materialize.' },
+            { id: 52, domain: 'Risk Management', text: 'What is scenario analysis in the context of risk management?', options: ['Creating fictional stories about the organization', 'Evaluating potential outcomes of hypothetical events', 'Avoiding any future planning', 'Cost reduction analysis only'], correct: 1, explanation: 'Scenario analysis involves evaluating potential outcomes of hypothetical events to inform risk and business continuity planning.' },
+            { id: 53, domain: 'Risk Management', text: 'What should a risk response plan include?', options: ['Only cost estimates', 'Specific actions, responsibilities, timelines, and success criteria', 'Only timelines for implementation', 'No specific details or commitments'], correct: 1, explanation: 'A risk response plan should include specific actions, responsible parties, timelines, and success criteria.' },
+            { id: 54, domain: 'Risk Management', text: 'How is quantitative risk analysis performed?', options: ['Using guesses and assumptions', 'Using historical data and statistical analysis to estimate probabilities and impacts', 'Avoiding numerical analysis', 'Exclusively qualitative without numbers'], correct: 1, explanation: 'Quantitative risk analysis uses historical data and statistical methods to estimate probabilities and impacts.' },
+            { id: 55, domain: 'Risk Management', text: 'What is qualitative risk analysis in risk management?', options: ['Using exact numbers and statistics', 'Assessing risks using subjective judgment and rating categories', 'Attempting to eliminate all risks', 'No assessment is performed'], correct: 1, explanation: 'Qualitative analysis assesses risks using subjective judgment, rating scales (high/medium/low), and prioritization matrices.' },
+            { id: 56, domain: 'Risk Management', text: 'Who should participate in the risk identification process?', options: ['Only IT management personnel', 'All relevant stakeholders across business and IT functions', 'Only external consultants', 'Only senior executives'], correct: 1, explanation: 'Risk identification should involve all relevant stakeholders to ensure comprehensive coverage of risks.' },
+            { id: 57, domain: 'Risk Management', text: 'What is the distinction between risk appetite and risk tolerance?', options: ['They are identical concepts', 'Appetite sets desired level; tolerance defines acceptable range around it', 'Appetite applies to insurance only', 'Tolerance applies only to executives'], correct: 1, explanation: 'Risk appetite sets the desired target; risk tolerance defines the acceptable range around that target.' },
+            { id: 58, domain: 'Risk Management', text: 'How should IT risk management support overall business objectives?', options: ['IT risk management should operate independently', 'By enabling strategic initiatives while managing risks at acceptable levels', 'By avoiding all risk and preventing innovation', 'By blocking all business initiatives'], correct: 1, explanation: 'IT risk management should enable business objectives by managing risks at levels acceptable to the organization.' },
+            { id: 59, domain: 'Risk Management', text: 'What is a risk threshold in risk management?', options: ['Irrelevant to modern risk management', 'A specific level at which predetermined actions or escalation is triggered', 'The maximum possible tolerance', 'The minimum acceptable risk level'], correct: 1, explanation: 'A risk threshold is a specific level that, when exceeded, triggers predetermined responses or escalation.' },
+            { id: 60, domain: 'Risk Management', text: 'How should organizations formally handle accepted risks?', options: ['Never formally acknowledge accepted risks', 'Document and obtain appropriate approvals for accepted risks', 'Hide accepted risks from stakeholders', 'Avoid making decisions about risk acceptance'], correct: 1, explanation: 'Accepted risks should be formally documented with appropriate approval to ensure accountability and understanding.' },
+            { id: 61, domain: 'Risk Management', text: 'What is the role of internal audit in assessing risk management?', options: ['No role in risk management assessment', 'Provide independent evaluation of risk management effectiveness', 'To create additional risks', 'To prevent management response to risks'], correct: 1, explanation: 'Internal audit provides independent assurance that risk management processes are effective and risks are properly managed.' },
+            { id: 62, domain: 'Risk Management', text: 'How should organizations measure the effectiveness of risk management?', options: ['Measurement is unnecessary', 'Using appropriate metrics across identification, mitigation, and monitoring', 'Only by cost savings', 'Only by the number of incidents'], correct: 1, explanation: 'Risk management effectiveness should be measured using appropriate metrics that evaluate the full risk management process.' },
+            { id: 63, domain: 'Risk Management', text: 'What is the distinction between business risk and IT risk?', options: ['They are identical', 'Business risk relates to business objectives; IT risk impacts business through IT', 'Business risk is always higher', 'IT risk is irrelevant to business'], correct: 1, explanation: 'Business risks relate to business objectives; IT risks are those that could impact business through IT failures.' },
+            { id: 64, domain: 'Risk Management', text: 'How should third-party and vendor risks be managed?', options: ['Ignore third-party risks', 'Through vendor assessment, contracts, and ongoing monitoring', 'Only evaluate risks at contract signing', 'Never formally assess vendor risks'], correct: 1, explanation: 'Third-party risks require assessment before engagement, contractual controls, and ongoing monitoring throughout the relationship.' },
+            { id: 65, domain: 'Risk Management', text: 'What is the importance of establishing a strong risk culture?', options: ['Risk culture has no organizational impact', 'Create environment where risks are identified and managed appropriately', 'Eliminate all risk discussions', 'Shift accountability for risks'], correct: 1, explanation: 'A strong risk culture encourages identification and communication of risks at all organizational levels.' },
+            { id: 66, domain: 'Risk Management', text: 'How should risk management integrate with strategic business planning?', options: ['Risk management is separate from strategic planning', 'Risk considerations should inform strategic decisions', 'Risk management applies only to existing operations', 'Only after strategy is finalized'], correct: 1, explanation: 'Risk management should be integrated into strategic planning to ensure new initiatives address risks appropriately.' },
+
+            // IT PROCESSES (20%) - 24 questions
+            { id: 67, domain: 'IT Processes', text: 'What is the primary purpose of implementing change management?', options: ['To prevent any and all changes', 'To ensure changes are planned, tested, and implemented with minimal risk', 'To accelerate all IT delivery without controls', 'To eliminate documentation requirements'], correct: 1, explanation: 'Change management establishes a controlled process for implementing IT changes while managing risks and minimizing disruptions.' },
+            { id: 68, domain: 'IT Processes', text: 'Which of the following components is essential to effective change management?', options: ['No documentation or approval process', 'Request submission, assessment, approval, implementation, and review', 'Only approvals by IT leadership', 'Only comprehensive documentation'], correct: 1, explanation: 'Effective change management includes request submission, assessment, approval, implementation, and post-implementation review.' },
+            { id: 69, domain: 'IT Processes', text: 'What is the fundamental purpose of configuration management?', options: ['To track costs only', 'To maintain accurate records of IT assets and their current configurations', 'To prevent system upgrades', 'To eliminate the need for documentation'], correct: 1, explanation: 'Configuration management maintains accurate, up-to-date records of all IT assets and their current configurations.' },
+            { id: 70, domain: 'IT Processes', text: 'What is a configuration item (CI)?', options: ['A cost estimate document', 'An IT component or service that is uniquely identified and tracked', 'A request for change', 'A budget line item'], correct: 1, explanation: 'A configuration item is any IT component, application, or service that is uniquely identifiable and tracked.' },
+            { id: 71, domain: 'IT Processes', text: 'What is the primary objective of capacity planning?', options: ['To minimize all IT spending', 'To ensure IT infrastructure can support current and anticipated business needs', 'To prevent organizational growth', 'To eliminate system upgrades'], correct: 1, explanation: 'Capacity planning ensures IT infrastructure has sufficient resources to support both current and anticipated business demands.' },
+            { id: 72, domain: 'IT Processes', text: 'Which process is responsible for ensuring IT services meet defined service levels?', options: ['Risk management only', 'Service level management', 'IT governance only', 'Incident management exclusively'], correct: 1, explanation: 'Service level management ensures IT services meet agreed-upon service levels and performance expectations.' },
+            { id: 73, domain: 'IT Processes', text: 'What is the primary objective of vendor management?', options: ['To eliminate vendor relationships', 'To ensure vendors deliver value and meet contractual obligations', 'To minimize oversight and accountability', 'To reduce organizational IT capabilities'], correct: 1, explanation: 'Vendor management ensures vendors meet contractual obligations, deliver quality services, and maintain performance standards.' },
+            { id: 74, domain: 'IT Processes', text: 'What must be included in a Service Level Agreement (SLA)?', options: ['Only penalty clauses', 'Service definitions, availability targets, support hours, and remedies', 'Only cost information', 'No specific performance criteria'], correct: 1, explanation: 'An SLA defines service scope, performance targets (availability, response times), support hours, and remedies for non-compliance.' },
+            { id: 75, domain: 'IT Processes', text: 'What is the primary purpose of access control in IT operations?', options: ['To prevent all user access', 'To ensure only authorized users can access resources appropriately', 'To eliminate productivity', 'To remove all accountability for access'], correct: 1, explanation: 'Access control ensures only authorized users can access resources based on their roles and needs.' },
+            { id: 76, domain: 'IT Processes', text: 'What does the principle of least privilege require?', options: ['No user privileges at all', 'Users receive only the minimum access required for their job', 'All users have full administrative access', 'Privileges increase without formal review'], correct: 1, explanation: 'Least privilege ensures users have only the access necessary to perform their specific job functions.' },
+            { id: 77, domain: 'IT Processes', text: 'What is the primary objective of asset management?', options: ['To hide asset location and status', 'To track and manage IT assets throughout their lifecycle', 'To eliminate IT assets', 'To avoid management responsibility'], correct: 1, explanation: 'Asset management tracks all IT assets, their location, status, and lifecycle for accountability and proper management.' },
+            { id: 78, domain: 'IT Processes', text: 'What must a comprehensive change management policy address?', options: ['Only emergency changes', 'Types of changes, approval processes, testing requirements, and documentation standards', 'No documentation or approval requirements', 'Only major organizational changes'], correct: 1, explanation: 'A change management policy should address all change types, approval requirements, testing, and documentation standards.' },
+            { id: 79, domain: 'IT Processes', text: 'What is an emergency or expedited change in change management?', options: ['All changes in the organization', 'Changes required to address urgent issues with expedited but controlled approval', 'Normal changes with standard procedures', 'A process that never occurs'], correct: 1, explanation: 'Emergency or expedited changes address critical issues but should still include appropriate approvals and documentation.' },
+            { id: 80, domain: 'IT Processes', text: 'What is the primary objective of problem management?', options: ['To ignore persistent issues', 'To identify and resolve root causes of incidents and prevent recurrence', 'To create more incidents', 'To avoid management responsibility'], correct: 1, explanation: 'Problem management focuses on identifying root causes of incidents and preventing future occurrences.' },
+            { id: 81, domain: 'IT Processes', text: 'What is the key distinction between an incident and a problem?', options: ['No distinction between them', 'Incident is unplanned disruption; problem is the root cause', 'An incident is permanent', 'Problems are temporary service disruptions'], correct: 1, explanation: 'An incident is an unplanned disruption; a problem is the underlying root cause that requires permanent resolution.' },
+            { id: 82, domain: 'IT Processes', text: 'What should release management accomplish?', options: ['Maximize deployment speed without testing', 'Coordinate and test changes to ensure quality and stability', 'Eliminate change planning', 'Implement changes immediately without preparation'], correct: 1, explanation: 'Release management plans and coordinates changes to ensure they are properly tested and deployed as planned.' },
+            { id: 83, domain: 'IT Processes', text: 'What is the purpose of backup and recovery processes?', options: ['To store data permanently', 'To ensure data and systems can be recovered after loss or disaster', 'To eliminate disaster scenarios', 'To reduce storage costs'], correct: 1, explanation: 'Backup and recovery processes ensure critical data and systems can be restored after loss, failure, or disaster.' },
+            { id: 84, domain: 'IT Processes', text: 'What must be included in a comprehensive disaster recovery plan?', options: ['No specific strategies or timelines', 'Recovery strategies, timelines, responsibilities, and testing procedures', 'Only recovery for major disasters', 'No testing or validation'], correct: 1, explanation: 'A disaster recovery plan defines recovery objectives, strategies, responsibilities, and includes regular testing.' },
+            { id: 85, domain: 'IT Processes', text: 'What does RTO (Recovery Time Objective) measure?', options: ['Risk Tolerance Option', 'The maximum acceptable time to recover a system before unacceptable impact', 'Recovery Technology Outage', 'A random recovery timeframe'], correct: 1, explanation: 'RTO is the maximum amount of time a system or service can be unavailable before causing unacceptable business impact.' },
+            { id: 86, domain: 'IT Processes', text: 'What does RPO (Recovery Point Objective) define?', options: ['Random Process Operations', 'The maximum acceptable data loss measured as time since last backup', 'Recovery Process Overview', 'Random data points'], correct: 1, explanation: 'RPO defines the maximum acceptable amount of data loss, typically measured as the time since the last backup.' },
+            { id: 87, domain: 'IT Processes', text: 'How often should disaster recovery plans be formally tested?', options: ['Never, testing is unnecessary', 'Regularly, at least annually', 'Only when disaster actually occurs', 'Only as required by external auditors'], correct: 1, explanation: 'Disaster recovery plans should be tested regularly (at least annually) to ensure they work as designed.' },
+            { id: 88, domain: 'IT Processes', text: 'What is the purpose of patch management processes?', options: ['To slow down system performance', 'To keep systems secure and stable by applying necessary updates', 'To eliminate all updates', 'To increase system vulnerabilities'], correct: 1, explanation: 'Patch management applies security and stability updates to systems in a controlled manner to reduce vulnerabilities.' },
+            { id: 89, domain: 'IT Processes', text: 'What must patch management processes consider?', options: ['Only deployment speed', 'Patch criticality, testing needs, deployment timing, and documentation', 'No testing requirements', 'No planning needed'], correct: 1, explanation: 'Effective patch management balances security criticality against stability risks through testing and planned deployment.' },
+            { id: 90, domain: 'IT Processes', text: 'What is the objective of performance monitoring in IT operations?', options: ['To criticize users and blame them', 'To ensure systems and services perform within acceptable parameters', 'To eliminate performance measurement', 'To avoid identifying issues'], correct: 1, explanation: 'Performance monitoring ensures IT systems and services meet agreed-upon performance standards and identifies issues quickly.' },
+
+            // IT OPERATIONS (15%) - 18 questions
+            { id: 91, domain: 'IT Operations', text: 'What is the primary role and responsibility of IT operations?', options: ['Strategic business planning only', 'Day-to-day management and support of IT systems and services', 'IT governance exclusively', 'Long-term technology planning'], correct: 1, explanation: 'IT operations manages the day-to-day delivery and support of IT systems and services to the organization.' },
+            { id: 92, domain: 'IT Operations', text: 'Which of the following is a key responsibility of IT operations?', options: ['Defining business strategy', 'Monitoring system availability and performance', 'Market research and analysis', 'Product development for external customers'], correct: 1, explanation: 'IT operations is responsible for maintaining system availability, performance, and reliability.' },
+            { id: 93, domain: 'IT Operations', text: 'What is the purpose of system monitoring and alerting?', options: ['To annoy operations staff with notifications', 'To detect issues early and notify appropriate personnel', 'To eliminate all operational problems', 'To avoid staff responsibility'], correct: 1, explanation: 'Monitoring and alerting detect system issues early, allowing rapid response before business impact occurs.' },
+            { id: 94, domain: 'IT Operations', text: 'What should comprehensive IT operations documentation include?', options: ['Nothing is needed', 'Procedures, runbooks, system architecture, and configuration history', 'Only user manuals', 'Only cost information'], correct: 1, explanation: 'Comprehensive operations documentation includes procedures, runbooks, system architecture, and configuration records.' },
+            { id: 95, domain: 'IT Operations', text: 'What is a runbook in IT operations?', options: ['A fiction novel', 'A detailed procedure for executing specific IT operational tasks', 'A budget or cost document', 'A user training guide'], correct: 1, explanation: 'A runbook provides step-by-step procedures for operations staff to perform specific tasks and respond to events.' },
+            { id: 96, domain: 'IT Operations', text: 'What is the primary purpose of shift management?', options: ['No particular purpose', 'To ensure continuous IT operations coverage across all hours', 'To minimize staffing costs', 'To eliminate 24/7 coverage'], correct: 1, explanation: 'Shift management ensures 24/7 IT operations coverage through scheduled shifts and staffing rotation.' },
+            { id: 97, domain: 'IT Operations', text: 'What should IT operations staffing planning address?', options: ['Only minimizing labor costs', 'Required skills, training, development, and succession planning', 'No formal planning needed', 'Only external contractor availability'], correct: 1, explanation: 'Operations staffing planning should address required skills, training, career development, and succession planning.' },
+            { id: 98, domain: 'IT Operations', text: 'What is the primary function of an IT operations center?', options: ['To increase operational costs', 'To provide centralized monitoring and coordination of IT services', 'To eliminate communication between teams', 'To slow incident response'], correct: 1, explanation: 'An operations center provides centralized monitoring, alerting, and coordination of IT services and incident response.' },
+            { id: 99, domain: 'IT Operations', text: 'What is the purpose of incident classification?', options: ['It serves no purpose', 'To categorize incidents by type, severity, and business impact', 'To ignore certain incidents', 'To hide incident information'], correct: 1, explanation: 'Incident classification helps prioritize response by categorizing incidents by type, severity, and business impact.' },
+            { id: 100, domain: 'IT Operations', text: 'What is the purpose of scheduling maintenance windows?', options: ['To disrupt all users', 'To schedule maintenance with minimal impact through planned downtime', 'To eliminate maintenance entirely', 'To avoid planning maintenance'], correct: 1, explanation: 'Maintenance windows are scheduled periods when planned maintenance is performed with minimal business impact.' },
+            { id: 101, domain: 'IT Operations', text: 'What must be communicated during scheduled maintenance windows?', options: ['Nothing needs to be communicated', 'Duration, affected systems, and expected business impact', 'Only to IT staff members', 'Only start times'], correct: 1, explanation: 'Users and stakeholders should be notified of maintenance windows, affected services, and expected impact.' },
+            { id: 102, domain: 'IT Operations', text: 'What is the role of escalation procedures in IT operations?', options: ['To blame operations staff', 'To route unresolved issues to appropriate expertise', 'To avoid responsibility', 'To delay issue resolution'], correct: 1, explanation: 'Escalation procedures ensure issues are routed to appropriate expertise to resolve them effectively.' },
+            { id: 103, domain: 'IT Operations', text: 'What must an effective escalation procedure address?', options: ['No specific criteria', 'Escalation criteria, timing, responsibilities, and communication', 'Only management escalation', 'No formal communication'], correct: 1, explanation: 'Escalation procedures should define criteria, timelines, responsible parties, and communication requirements.' },
+            { id: 104, domain: 'IT Operations', text: 'What is capacity management in the context of operations?', options: ['Cost minimization only', 'Ensuring adequate resources to support current and future demand', 'Preventing organizational growth', 'Avoiding future planning'], correct: 1, explanation: 'Capacity management ensures IT infrastructure has sufficient resources to support current and anticipated demand.' },
+            { id: 105, domain: 'IT Operations', text: 'What is the purpose of establishing baselines in IT operations?', options: ['No practical purpose', 'To establish normal performance for comparison and alerting', 'To eliminate metrics', 'To avoid monitoring'], correct: 1, explanation: 'Baselines establish normal performance levels, enabling detection of abnormal behavior and early issue identification.' },
+            { id: 106, domain: 'IT Operations', text: 'How should IT operations handle performance trends?', options: ['Ignore trends entirely', 'Analyze trends to anticipate issues and plan capacity', 'Only react to crises', 'No analysis is needed'], correct: 1, explanation: 'Trend analysis helps anticipate resource issues and allows proactive planning before problems occur.' },
+            { id: 107, domain: 'IT Operations', text: 'What is the purpose of IT operations metrics and reporting?', options: ['No practical purpose', 'To measure operational effectiveness and identify improvement areas', 'To hide operational problems', 'To avoid accountability'], correct: 1, explanation: 'Operations metrics provide visibility into system performance, availability, and operational effectiveness.' },
+            { id: 108, domain: 'IT Operations', text: 'What should IT operations communication include?', options: ['Only problem information', 'Status updates, alerts, maintenance notifications, and incident information', 'No formal communication', 'Only to IT staff'], correct: 1, explanation: 'Effective operations communication keeps stakeholders informed about system status, issues, and maintenance.' },
+
+            // INCIDENT MANAGEMENT (10%) - 12 questions
+            { id: 109, domain: 'Incident Management', text: 'What is the primary goal of incident management processes?', options: ['To blame operations staff', 'To restore normal service and minimize business impact', 'To create incidents', 'To avoid responsibility'], correct: 1, explanation: 'Incident management aims to restore services as quickly as possible to minimize business disruption.' },
+            { id: 110, domain: 'Incident Management', text: 'What is the correct definition of an incident?', options: ['A planned maintenance window', 'An unplanned interruption to IT service or reduction in service quality', 'A successful system deployment', 'A project milestone'], correct: 1, explanation: 'An incident is any unplanned event that interrupts IT services or reduces service quality.' },
+            { id: 111, domain: 'Incident Management', text: 'What are the key phases of incident management?', options: ['Only resolution activities', 'Detection, response, investigation, resolution, and closure', 'Only reporting and documentation', 'Only escalation procedures'], correct: 1, explanation: 'Incident management includes detection, initial response, investigation, resolution, and closure.' },
+            { id: 112, domain: 'Incident Management', text: 'What is incident priority based on?', options: ['Randomly assigned', 'Impact and urgency to determine appropriate response timing', 'Only financial considerations', 'Random assignment without criteria'], correct: 1, explanation: 'Priority is determined by analyzing impact (business effect) and urgency (time-sensitivity) to guide response.' },
+            { id: 113, domain: 'Incident Management', text: 'What must be included in formal incident records?', options: ['Only resolution information', 'Date, time, impact, symptoms, resolution, and lessons learned', 'Only who reported it', 'Only associated costs'], correct: 1, explanation: 'Incident records should document all details including discovery, impact, resolution, and actions to prevent recurrence.' },
+            { id: 114, domain: 'Incident Management', text: 'What is the role of incident classification?', options: ['To ignore incidents', 'To categorize and prioritize incidents for appropriate response', 'To eliminate incidents', 'To assign blame'], correct: 1, explanation: 'Classification enables proper prioritization and routing of incidents to ensure quick, appropriate response.' },
+            { id: 115, domain: 'Incident Management', text: 'What must incident response procedures include?', options: ['No specific procedures', 'Detection, response, diagnosis, resolution, and communication', 'Only major incidents', 'No detailed steps'], correct: 1, explanation: 'Response procedures should address all steps from initial detection through resolution and stakeholder communication.' },
+            { id: 116, domain: 'Incident Management', text: 'What is the purpose of incident communication?', options: ['No communication is needed', 'To keep stakeholders informed of incident status and expected resolution', 'To hide incident details', 'To delay resolution efforts'], correct: 1, explanation: 'Regular incident communication maintains stakeholder awareness and confidence even during service disruptions.' },
+            { id: 117, domain: 'Incident Management', text: 'How should incident severity be determined?', options: ['Without any criteria', 'Based on business impact and the number of affected users', 'Only by total costs', 'Never formally assessed'], correct: 1, explanation: 'Severity should reflect the business impact and number of affected users to ensure appropriate resource allocation.' },
+            { id: 118, domain: 'Incident Management', text: 'What is the key difference between an incident and a service request?', options: ['No difference exists', 'Incident is unplanned disruption; service request is user request', 'They are the same thing', 'Service request is more urgent'], correct: 1, explanation: 'Incidents are unplanned disruptions needing restoration; service requests are routine user requests.' },
+            { id: 119, domain: 'Incident Management', text: 'What should be accomplished after incident resolution?', options: ['Nothing, the incident is done', 'Closure, documentation, and root cause analysis if needed', 'Immediately forget about it', 'No documentation is needed'], correct: 1, explanation: 'Post-incident activities include proper closure, documentation, root cause analysis, and learning to prevent recurrence.' },
+            { id: 120, domain: 'Incident Management', text: 'What is the purpose of incident metrics and analysis?', options: ['No useful purpose', 'To measure effectiveness and identify improvement areas', 'To hide operational problems', 'To avoid accountability'], correct: 1, explanation: 'Incident metrics provide insights into frequency, severity, resolution times, and areas needing improvement.' }
+        ];
+
+        // Apply smart randomization to all questions
+        const quizData = smartRandomizeAnswers(baseQuizData);
+
+        // STATE MANAGEMENT
+        let state = {
+            currentView: 'dashboard',
+            selectedDomains: [],
+            selectedQuestions: [],
+            currentQuestionIndex: 0,
+            quizStarted: false,
+            currentAttempt: {}, // { questionId: selectedOptionIndex }
+            attemptHistory: [], // Array of all quiz attempts
+            questionAttempts: {} // { questionId: [attempt1, attempt2, ...] }
+        };
+
+        // Initialize from localStorage
+        function loadState() {
+            const saved = localStorage.getItem('cisaQuizStateV4');
+            if (saved) {
+                state = JSON.parse(saved);
+            }
+            initializeQuestionAttempts();
+        }
+
+        function saveState() {
+            localStorage.setItem('cisaQuizStateV4', JSON.stringify(state));
+        }
+
+        function initializeQuestionAttempts() {
+            quizData.forEach(q => {
+                if (!state.questionAttempts[q.id]) {
+                    state.questionAttempts[q.id] = [];
+                }
+            });
+        }
+
+        function getDomainProgress() {
+            const domains = ['Governance', 'Risk Management', 'IT Processes', 'IT Operations', 'Incident Management'];
+            const progress = {};
+
+            domains.forEach(domain => {
+                const domainQuestions = quizData.filter(q => q.domain === domain);
+                const answered = domainQuestions.filter(q => state.questionAttempts[q.id].length > 0).length;
+                const unanswered = domainQuestions.length - answered;
+                progress[domain] = { answered, unanswered, total: domainQuestions.length };
+            });
+
+            return progress;
+        }
+
+        function getQuestionScore(questionId) {
+            const attempts = state.questionAttempts[questionId] || [];
+            if (attempts.length === 0) return null;
+
+            const question = quizData.find(q => q.id === questionId);
+            const correct = attempts.filter(att => att === question.correct).length;
+            const percentage = Math.round(correct / attempts.length * 100);
+
+            return { correct, total: attempts.length, percentage };
+        }
+
+        function getLatestScore() {
+            if (state.attemptHistory.length === 0) return null;
+            return state.attemptHistory[state.attemptHistory.length - 1];
+        }
+
+        function getCumulativeScore() {
+            if (state.attemptHistory.length === 0) return null;
+
+            let totalCorrect = 0;
+            let totalQuestions = 0;
+
+            state.attemptHistory.forEach(attempt => {
+                totalCorrect += attempt.correct;
+                totalQuestions += attempt.totalQuestions;
+            });
+
+            return {
+                correct: totalCorrect,
+                total: totalQuestions,
+                percentage: Math.round(totalCorrect / totalQuestions * 100)
+            };
+        }
+
+        // UI FUNCTIONS
+        function switchView(view) {
+            state.currentView = view;
+            document.querySelectorAll('.view').forEach(v => v.classList.remove('active'));
+            document.getElementById(view).classList.add('active');
+            document.querySelectorAll('.nav-tab').forEach(tab => tab.classList.remove('active'));
+            event.target.classList.add('active');
+
+            if (view === 'dashboard') renderDashboard();
+            else if (view === 'quiz') renderQuizSetup();
+            else if (view === 'missed') renderMissedQuestions();
+        }
+
+        function renderTargetIndicator(score) {
+            if (!score) return '';
+            const diff = score.percentage - PASSING_SCORE;
+            const className = diff >= 0 ? 'above' : 'below';
+            const symbol = diff >= 0 ? '+' : '';
+            return `<div class="target-indicator ${className}">Target: ${PASSING_SCORE}% | ${symbol}${diff}%</div>`;
+        }
+
+        function renderDashboard() {
+            const progress = getDomainProgress();
+            let totalAnswered = 0;
+            let totalQuestions = quizData.length;
+
+            Object.values(progress).forEach(p => {
+                totalAnswered += p.answered;
+            });
+
+            document.getElementById('totalAnswered').textContent = totalAnswered;
+            document.getElementById('totalAnsweredSub').textContent = `${totalAnswered} of ${totalQuestions} questions`;
+            document.getElementById('totalProgressBar').style.width = (totalAnswered / totalQuestions * 100) + '%';
+
+            const latest = getLatestScore();
+            document.getElementById('latestScore').textContent = latest ? latest.percentage + '%' : '—';
+            document.getElementById('latestScoreSub').textContent = latest ? `${latest.correct}/${latest.totalQuestions} correct` : 'Complete a quiz to see results';
+            document.getElementById('latestTargetInd').innerHTML = renderTargetIndicator(latest);
+
+            const cumulative = getCumulativeScore();
+            document.getElementById('cumulativeScore').textContent = cumulative ? cumulative.percentage + '%' : '—';
+            document.getElementById('cumulativeScoreSub').textContent = cumulative ? `${cumulative.correct}/${cumulative.total} correct` : 'Average across all attempts';
+            document.getElementById('cumulativeTargetInd').innerHTML = renderTargetIndicator(cumulative);
+
+            const domainStats = document.getElementById('domainStats');
+            domainStats.innerHTML = '';
+
+            Object.entries(progress).forEach(([domain, p]) => {
+                const percentComplete = Math.round(p.answered / p.total * 100);
+
+                domainStats.innerHTML += `
+                    <div class="stat-card">
+                        <h3>${domain}</h3>
+                        <div class="value">${p.answered}/${p.total}</div>
+                        <div class="subtext">${p.answered} answered, ${p.unanswered} remaining</div>
+                        <div class="progress-bar">
+                            <div class="progress-fill" style="width: ${percentComplete}%"></div>
+                        </div>
+                    </div>
+                `;
+            });
+        }
+
+        function renderQuizSetup() {
+            const domainList = ['Governance', 'Risk Management', 'IT Processes', 'IT Operations', 'Incident Management'];
+
+            let html = `
+                <div class="quiz-controls">
+                    <div class="control-group">
+                        <label>Select Domains:</label>
+                        <div class="domain-buttons">
+            `;
+
+            domainList.forEach(domain => {
+                const isSelected = state.selectedDomains.includes(domain);
+                html += `<button class="domain-btn ${isSelected ? 'selected' : ''}" onclick="toggleDomain('${domain}')">${domain}</button>`;
+            });
+
+            html += `
+                        </div>
+                    </div>
+
+                    <div class="control-group">
+                        <label>Filter Questions:</label>
+                        <div class="checkbox-group">
+                            <div class="checkbox-item">
+                                <input type="checkbox" id="missedOnly" onchange="toggleMissedOnly()">
+                                <label for="missedOnly">Show only questions missed in last attempt</label>
+                            </div>
+                            <div class="checkbox-item">
+                                <input type="checkbox" id="belowTarget" onchange="toggleBelowTarget()">
+                                <label for="belowTarget">Show only questions below 56% target score</label>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="button-group">
+                        <button class="btn btn-primary" onclick="startQuiz()">Start Quiz</button>
+                    </div>
+                </div>
+            `;
+
+            // Check for in-progress quizzes
+            if (state.selectedQuestions.length > 0 && state.quizStarted) {
+                const progressText = `${state.currentQuestionIndex + 1} of ${state.selectedQuestions.length}`;
+                html += `
+                    <div class="resume-options">
+                        <h3>Quiz in Progress</h3>
+                        <p>Progress: ${progressText}</p>
+                        <div class="button-group">
+                            <button class="btn btn-success" onclick="resumeQuiz()">Resume Quiz</button>
+                            <button class="btn btn-secondary" onclick="restartQuiz()">Restart Quiz</button>
+                        </div>
+                    </div>
+                `;
+            }
+
+            document.getElementById('quizSetup').innerHTML = html;
+            document.getElementById('quizContent').style.display = 'none';
+        }
+
+        function toggleDomain(domain) {
+            const index = state.selectedDomains.indexOf(domain);
+            if (index > -1) {
+                state.selectedDomains.splice(index, 1);
+            } else {
+                state.selectedDomains.push(domain);
+            }
+            renderQuizSetup();
+        }
+
+        function toggleMissedOnly() {
+            renderQuizSetup();
+        }
+
+        function toggleBelowTarget() {
+            renderQuizSetup();
+        }
+
+        function startQuiz() {
+            if (state.selectedDomains.length === 0) {
+                alert('Please select at least one domain');
+                return;
+            }
+
+            const missedOnly = document.getElementById('missedOnly').checked;
+            const belowTarget = document.getElementById('belowTarget').checked;
+
+            let questions = quizData.filter(q => state.selectedDomains.includes(q.domain));
+
+            if (missedOnly) {
+                questions = questions.filter(q => {
+                    const attempts = state.questionAttempts[q.id] || [];
+                    if (attempts.length === 0) return false;
+                    const lastAttempt = attempts[attempts.length - 1];
+                    return lastAttempt !== q.correct;
+                });
+            }
+
+            if (belowTarget) {
+                questions = questions.filter(q => {
+                    const score = getQuestionScore(q.id);
+                    if (!score) return true; // Never attempted
+                    return score.percentage < PASSING_SCORE;
+                });
+            }
+
+            if (questions.length === 0) {
+                alert('No questions available for the selected criteria');
+                return;
+            }
+
+            state.selectedQuestions = questions;
+            state.currentQuestionIndex = 0;
+            state.currentAttempt = {};
+            state.quizStarted = true;
+            saveState();
+            renderQuiz();
+        }
+
+        function resumeQuiz() {
+            renderQuiz();
+        }
+
+        function restartQuiz() {
+            state.currentQuestionIndex = 0;
+            state.currentAttempt = {};
+            state.quizStarted = true;
+            saveState();
+            renderQuizSetup();
+        }
+
+        function renderQuiz() {
+            document.getElementById('quizSetup').innerHTML = '';
+            document.getElementById('quizContent').style.display = 'block';
+
+            const question = state.selectedQuestions[state.currentQuestionIndex];
+            const isAnswered = state.currentAttempt[question.id] !== undefined;
+            const selectedOption = state.currentAttempt[question.id];
+            const score = getQuestionScore(question.id);
+
+            let html = `
+                <div class="quiz-progress">
+                    <div class="progress-info">
+                        <span>Question ${state.currentQuestionIndex + 1} of ${state.selectedQuestions.length}</span>
+                        <span id="quizDomain">${question.domain}</span>
+                    </div>
+                    <div class="progress-bar">
+                        <div class="progress-fill" style="width: ${Math.round((state.currentQuestionIndex + 1) / state.selectedQuestions.length * 100)}%"></div>
+                    </div>
+                </div>
+
+                <div class="question-card">
+                    <div class="question-header">
+                        <span class="question-number">Q${question.id}</span>
+                        <div style="text-align: right;">
+                            <span class="question-answered ${isAnswered ? 'answered' : 'unanswered'}">
+                                ${isAnswered ? '✓ Answered' : '○ Unanswered'}
+                            </span>
+                            ${score ? `<div style="font-size: 0.8em; color: #667eea; margin-top: 4px;">${score.correct}/${score.total} (${score.percentage}%)</div>` : ''}
+                        </div>
+                    </div>
+                    <div class="question-text">${question.text}</div>
+                    <div class="options">
+            `;
+
+            question.options.forEach((option, index) => {
+                const isSelected = selectedOption === index;
+                let optionClass = '';
+
+                if (isAnswered) {
+                    if (index === question.correct) {
+                        optionClass = 'correct';
+                    } else if (isSelected && index !== question.correct) {
+                        optionClass = 'incorrect';
+                    }
+                } else if (isSelected) {
+                    optionClass = 'selected';
+                }
+
+                html += `
+                    <button class="option ${optionClass}" onclick="selectOption(${index})">
+                        ${String.fromCharCode(65 + index)}. ${option}
+                    </button>
+                `;
+            });
+
+            html += `</div>`;
+
+            if (isAnswered) {
+                html += `<div class="explanation"><strong>Explanation:</strong> ${question.explanation}</div>`;
+            }
+
+            html += `
+                <div class="button-group">
+                    <button class="btn btn-secondary" onclick="previousQuestion()" ${state.currentQuestionIndex === 0 ? 'disabled' : ''}>← Previous</button>
+                    <button class="btn btn-secondary" onclick="exitQuiz()">Exit Quiz</button>
+                    <button class="btn btn-primary" onclick="nextQuestion()" ${state.currentQuestionIndex === state.selectedQuestions.length - 1 ? 'disabled' : ''}>Next →</button>
+                </div>
+
+                ${state.currentQuestionIndex === state.selectedQuestions.length - 1 ? `
+                    <div class="button-group">
+                        <button class="btn btn-success" onclick="submitQuiz()">Submit Quiz</button>
+                    </div>
+                ` : ''}
+            `;
+
+            document.getElementById('quizContent').innerHTML = html;
+        }
+
+        function selectOption(index) {
+            const question = state.selectedQuestions[state.currentQuestionIndex];
+            state.currentAttempt[question.id] = index;
+            saveState();
+            renderQuiz();
+        }
+
+        function nextQuestion() {
+            if (state.currentQuestionIndex < state.selectedQuestions.length - 1) {
+                state.currentQuestionIndex++;
+                renderQuiz();
+            }
+        }
+
+        function previousQuestion() {
+            if (state.currentQuestionIndex > 0) {
+                state.currentQuestionIndex--;
+                renderQuiz();
+            }
+        }
+
+        function exitQuiz() {
+            if (confirm('Exit quiz without submitting? Your progress will be saved.')) {
+                state.quizStarted = false;
+                saveState();
+                renderQuizSetup();
+            }
+        }
+
+        function submitQuiz() {
+            const correct = state.selectedQuestions.filter(q => state.currentAttempt[q.id] === q.correct).length;
+            const score = Math.round(correct / state.selectedQuestions.length * 100);
+
+            // Save individual question attempts
+            state.selectedQuestions.forEach(q => {
+                if (!state.questionAttempts[q.id]) {
+                    state.questionAttempts[q.id] = [];
+                }
+                state.questionAttempts[q.id].push(state.currentAttempt[q.id]);
+            });
+
+            // Save attempt to history
+            const quizRecord = {
+                timestamp: new Date().toISOString(),
+                domains: state.selectedDomains,
+                totalQuestions: state.selectedQuestions.length,
+                correct,
+                percentage: score
+            };
+
+            state.attemptHistory.push(quizRecord);
+            state.quizStarted = false;
+            state.currentQuestionIndex = 0;
+            saveState();
+
+            alert(`Quiz Complete!\nScore: ${score}%\nCorrect: ${correct}/${state.selectedQuestions.length}${score >= PASSING_SCORE ? '\n✓ Meets CISA target!' : '\n○ Below target, keep studying!'}`);
+            renderQuizSetup();
+        }
+
+        function quickStartDomain() {
+            state.selectedDomains = ['Governance'];
+            document.getElementById('quiz').classList.add('active');
+            document.getElementById('dashboard').classList.remove('active');
+            document.querySelector('.nav-tabs').children[1].classList.add('active');
+            document.querySelector('.nav-tabs').children[0].classList.remove('active');
+            renderQuizSetup();
+        }
+
+        function quickStartAll() {
+            state.selectedDomains = ['Governance', 'Risk Management', 'IT Processes', 'IT Operations', 'Incident Management'];
+            document.getElementById('quiz').classList.add('active');
+            document.getElementById('dashboard').classList.remove('active');
+            document.querySelector('.nav-tabs').children[1].classList.add('active');
+            document.querySelector('.nav-tabs').children[0].classList.remove('active');
+            renderQuizSetup();
+        }
+
+        function renderMissedQuestions() {
+            // Questions missed in the most recent quiz
+            const recentQuestions = state.attemptHistory.length > 0 ?
+                state.attemptHistory[state.attemptHistory.length - 1].questions : [];
+
+            const missedQuestions = state.selectedQuestions && state.selectedQuestions.length > 0 ?
+                state.selectedQuestions.filter(q => {
+                    const attempts = state.questionAttempts[q.id] || [];
+                    if (attempts.length === 0) return false;
+                    const lastAttempt = attempts[attempts.length - 1];
+                    return lastAttempt !== q.correct;
+                }) :
+                quizData.filter(q => {
+                    const attempts = state.questionAttempts[q.id] || [];
+                    if (attempts.length === 0) return false;
+                    const lastAttempt = attempts[attempts.length - 1];
+                    return lastAttempt !== q.correct;
+                });
+
+            if (missedQuestions.length === 0) {
+                document.getElementById('missedContent').innerHTML = `
+                    <div class="empty-state">
+                        <p style="font-size: 1.2em; margin-bottom: 10px;">✓ Great work!</p>
+                        <p>No missed questions in your most recent attempts.</p>
+                    </div>
+                `;
+                return;
+            }
+
+            let html = '';
+
+            missedQuestions.forEach(q => {
+                const attempts = state.questionAttempts[q.id] || [];
+                const score = getQuestionScore(q.id);
+                const lastAttemptIndex = attempts[attempts.length - 1];
+                const selectedAnswer = q.options[lastAttemptIndex];
+                const correctAnswer = q.options[q.correct];
+
+                html += `
+                    <div class="missed-question">
+                        <h4>${q.domain} - Q${q.id}</h4>
+                        <p style="margin-bottom: 10px;"><strong>${q.text}</strong></p>
+                        <p style="margin: 8px 0; color: #d9534f;"><strong>Your Last Answer:</strong> ${selectedAnswer}</p>
+                        <p style="margin: 8px 0; color: #5cb85c;"><strong>Correct Answer:</strong> ${correctAnswer}</p>
+                        ${score ? `<p style="margin: 8px 0; color: #667eea;"><strong>Your Record:</strong> ${score.correct}/${score.total} correct (${score.percentage}%)</p>` : ''}
+                        <div class="explanation">${q.explanation}</div>
+                    </div>
+                `;
+            });
+
+            document.getElementById('missedContent').innerHTML = html;
+        }
+
+        function clearAllData() {
+            if (confirm('Clear all quiz data and progress? This cannot be undone.')) {
+                state = {
+                    currentView: 'dashboard',
+                    selectedDomains: [],
+                    selectedQuestions: [],
+                    currentQuestionIndex: 0,
+                    quizStarted: false,
+                    currentAttempt: {},
+                    attemptHistory: [],
+                    questionAttempts: {}
+                };
+                localStorage.removeItem('cisaQuizStateV4');
+                loadState();
+                renderDashboard();
+                alert('All data cleared.');
+            }
+        }
+
+        // Initialize
+        loadState();
+        renderDashboard();
+    </script>
+</body>
+</html>
