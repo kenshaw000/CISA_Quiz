@@ -232,13 +232,13 @@
 
 <script>
 // ─── CONFIG ───────────────────────────────────────────────
-const NOTION_TOKEN  = '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';
+// Replace MAC_MINI_IP with your Mac Mini's local IP address
+// Find it: System Settings → Wi-Fi → Details → IP Address
+const PROXY_URL      = 'http://100.91.241.2:3000/capture';
 const DB_INBOX       = 'cf9dd36dcd484f658016a73373b328a3';
 const DB_INTERACTIONS= '328f7d31fb0a49c28d87569f3811dd74';
 const DB_IDEAS       = '769d6d407abb45489455723fcf4b261f';
 const DB_PROJECTS    = '0b21e5e8d6b540248c500030e4fccf0f';
-const NOTION_API     = 'https://api.notion.com/v1/pages';
-const NOTION_VERSION = '2022-06-28';
 // ──────────────────────────────────────────────────────────
 
 let currentCat = 'inbox';
@@ -288,13 +288,9 @@ function setOnline(online) {
 }
 
 async function notionPost(body) {
-  const res = await fetch(NOTION_API, {
+  const res = await fetch(PROXY_URL, {
     method: 'POST',
-    headers: {
-      'Authorization': `Bearer ${NOTION_TOKEN}`,
-      'Content-Type': 'application/json',
-      'Notion-Version': NOTION_VERSION
-    },
+    headers: { 'Content-Type': 'application/json' },
     body: JSON.stringify(body)
   });
   if (!res.ok) {
@@ -385,10 +381,10 @@ function saveNoteOnly() {
   document.getElementById('captureText').value = '';
 }
 
-// Check connectivity on load
-fetch('https://api.notion.com/v1/users/me', {
-  headers: { 'Authorization': `Bearer ${NOTION_TOKEN}`, 'Notion-Version': NOTION_VERSION }
-}).then(r => setOnline(r.ok)).catch(() => setOnline(false));
+// Check connectivity on load — ping the proxy
+fetch(PROXY_URL, { method: 'OPTIONS' })
+  .then(r => setOnline(true))
+  .catch(() => setOnline(false));
 </script>
 </body>
 </html>
